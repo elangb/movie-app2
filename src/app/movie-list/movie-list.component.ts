@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { MovieService } from '../movie.service';
 import { Movie } from '../movie.model';
@@ -11,7 +11,9 @@ import { Movie } from '../movie.model';
 export class MovieListComponent implements OnInit {
   movies: Movie[] = [];
   searchQuery: string = '';
-  page: number = 1;
+  totalResults: number = 0;
+  currentPage: number = 1;
+  itemsPerPage: number = 1000; // Jumlah film per halaman
   isLoading: boolean = false;
 
   constructor(private movieService: MovieService, private router: Router) { }
@@ -22,11 +24,12 @@ export class MovieListComponent implements OnInit {
 
   loadMovies() {
     this.isLoading = true;
-    this.movieService.searchMovies(this.searchQuery, this.page).subscribe(
+    this.movieService.searchMovies(this.searchQuery, this.currentPage).subscribe(
       (response: any) => {
         if (response && response.Search) {
           this.movies = this.movies.concat(response.Search);
-          this.page++;
+          this.totalResults = parseInt(response.totalResults);
+          this.currentPage++;
         }
         this.isLoading = false;
       },
@@ -38,13 +41,14 @@ export class MovieListComponent implements OnInit {
   }
 
   searchMovies() {
-    this.page = 1; // Reset page when performing a new search
+    this.currentPage = 1; // Reset page when performing a new search
     this.movies = []; // Clear existing movies
     this.loadMovies();
   }
 
+  @HostListener('window:scroll', ['$event'])
   onScroll(event: any) {
-    const container = event.target;
+    const container = event.target.documentElement;
     const scrollHeight = container.scrollHeight;
     const scrollTop = container.scrollTop;
     const clientHeight = container.clientHeight;
