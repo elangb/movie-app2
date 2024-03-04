@@ -9,10 +9,10 @@ import { Movie } from '../movie.model';
   styleUrls: ['./movie-list.component.css']
 })
 export class MovieListComponent implements OnInit {
-  movies: Movie[] = [];
+  movies: Movie[] = []; // Array untuk menyimpan daftar film
   searchQuery: string = '';
   totalResults: number = 0;
-  currentPage: number = 1;
+  currentPage: number = 1; // Inisiasi Halaman
   itemsPerPage: number = 1000; // Jumlah film per halaman
   isLoading: boolean = false;
 
@@ -22,13 +22,17 @@ export class MovieListComponent implements OnInit {
     this.loadMovies();
   }
 
+  // Memuat daftar film
   loadMovies() {
     this.isLoading = true;
     this.movieService.searchMovies(this.searchQuery, this.currentPage).subscribe(
       (response: any) => {
+        // Memastikan respons memiliki properti Search yang berisi daftar film
         if (response && response.Search) {
           this.movies = this.movies.concat(response.Search);
+          // Memperbarui hasil
           this.totalResults = parseInt(response.totalResults);
+          // Memuat halaman berikutnya
           this.currentPage++;
         }
         this.isLoading = false;
@@ -40,12 +44,14 @@ export class MovieListComponent implements OnInit {
     );
   }
 
+  // Mencari film berdasarkan kueri
   searchMovies() {
     this.currentPage = 1; // Reset page when performing a new search
     this.movies = []; // Clear existing movies
     this.loadMovies();
   }
 
+  // Scroll Halaman
   @HostListener('window:scroll', ['$event'])
   onScroll(event: any) {
     const container = event.target.documentElement;
@@ -59,6 +65,7 @@ export class MovieListComponent implements OnInit {
     }
   }
 
+  //...
   navigateToMovieDetail(movieId: string) {
     this.router.navigate(['/movie', movieId]);
   }

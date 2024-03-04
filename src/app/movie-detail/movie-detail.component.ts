@@ -17,18 +17,23 @@ export class MovieDetailComponent implements OnInit {
     private router: Router,
     private movieService: MovieService
   ) { }
-
+  
+  // ...
   ngOnInit(): void {
     this.route.params.subscribe(params => {
+      // Mendapatkan ID film dari parameter URL
       this.movieId = params['id'];
+      // Jika ID film tersedia, maka ambil detail film
       if (this.movieId) {
         this.getMovieDetails();
       }
     });
   }
 
+  // Mendapatkan detail film
   getMovieDetails() {
     if (this.movieId) {
+      // mendapatkan detail film berdasarkan ID
       this.movieService.getMovieDetails(this.movieId).subscribe(
         (response: any) => {
           this.movie = response;
@@ -40,6 +45,7 @@ export class MovieDetailComponent implements OnInit {
     }
   }
 
+  // Kembali ke halaman daftar film
   goBack() {
     this.router.navigate(['/movies']);
   }
