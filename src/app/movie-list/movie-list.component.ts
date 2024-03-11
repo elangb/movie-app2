@@ -9,12 +9,14 @@ import { Movie } from '../movie.model';
   styleUrls: ['./movie-list.component.css']
 })
 export class MovieListComponent implements OnInit {
-  movies: Movie[] = []; // Array untuk menyimpan daftar film
+  movies: Movie[] = [];
   searchQuery: string = '';
   totalResults: number = 0;
-  currentPage: number = 1; // Inisiasi Halaman
-  itemsPerPage: number = 1000; // Jumlah film per halaman
+  currentPage: number = 1;
+  itemsPerPage: number = 1000;
   isLoading: boolean = false;
+  filteredMovies: Movie[] = [];
+  displayMovieTitle: (value: any) => string = (value: any) => ''; // Initialize with a default function
 
   constructor(private movieService: MovieService, private router: Router) { }
 
@@ -22,17 +24,15 @@ export class MovieListComponent implements OnInit {
     this.loadMovies();
   }
 
-  // Memuat daftar film
   loadMovies() {
     this.isLoading = true;
     this.movieService.searchMovies(this.searchQuery, this.currentPage).subscribe(
       (response: any) => {
-        // Memastikan respons memiliki properti Search yang berisi daftar film
         if (response && response.Search) {
           this.movies = this.movies.concat(response.Search);
-          // Memperbarui hasil
           this.totalResults = parseInt(response.totalResults);
-          // Memuat halaman berikutnya
+          // Update filteredMovies on loadMovies
+          this.filteredMovies = this._filter(this.searchQuery);
           this.currentPage++;
         }
         this.isLoading = false;
@@ -44,28 +44,23 @@ export class MovieListComponent implements OnInit {
     );
   }
 
-  // Mencari film berdasarkan kueri
+  private _filter(value: string): Movie[] {
+    const filterValue = value.toLowerCase();
+    return this.movies.filter(movie => movie.Title.toLowerCase().includes(filterValue));
+  }
+
   searchMovies() {
-    this.currentPage = 1; // Reset page when performing a new search
-    this.movies = []; // Clear existing movies
+    this.currentPage = 1;
+    this.movies = [];
     this.loadMovies();
   }
 
-  // Scroll Halaman
-  @HostListener('window:scroll', ['$event'])
-  onScroll(event: any) {
-    const container = event.target.documentElement;
-    const scrollHeight = container.scrollHeight;
-    const scrollTop = container.scrollTop;
-    const clientHeight = container.clientHeight;
-    const scrollPosition = scrollTop + clientHeight;
-
-    if (scrollPosition >= scrollHeight && !this.isLoading) {
-      this.loadMovies();
-    }
+  onSearchQueryChanged(event: Event) {
+    this.searchQuery = (event.target as HTMLInputElement).value;
+    this.filteredMovies = this._filter(this.searchQuery);
   }
+  
 
-  //...
   navigateToMovieDetail(movieId: string) {
     this.router.navigate(['/movie', movieId]);
   }

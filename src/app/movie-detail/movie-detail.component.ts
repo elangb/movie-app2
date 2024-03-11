@@ -18,7 +18,7 @@ export class MovieDetailComponent implements OnInit {
     private movieService: MovieService
   ) { }
   
-  // ...
+  // inisiasi komponen
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       // Mendapatkan ID film dari parameter URL

@@ -12,14 +12,16 @@ export const initialState: MovieState = {
   selectedMovieId: null,
 };
 
+// untuk mengelola state film
 export const movieReducer = createReducer(
   initialState,
   on(MovieActions.loadMoviesSuccess, (state, { movies }) => ({
     ...state,
-    movies,
+    movies, // Memperbarui daftar film dalam state
   })),
+  // pemilihan film
   on(MovieActions.selectMovie, (state, { id }) => ({
     ...state,
-    selectedMovieId: id,
+    selectedMovieId: id, // memilih berdasarkan ID
   }))
 );
