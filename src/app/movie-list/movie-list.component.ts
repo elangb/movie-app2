@@ -9,6 +9,9 @@ import { Movie } from '../movie.model';
   styleUrls: ['./movie-list.component.css']
 })
 export class MovieListComponent implements OnInit {
+onLogoClick() {
+throw new Error('Method not implemented.');
+}
   movies: Movie[] = [];
   searchQuery: string = '';
   totalResults: number = 0;
@@ -58,6 +61,10 @@ export class MovieListComponent implements OnInit {
     this.searchQuery = event.option.value.Title;
     this.filteredMovies = [event.option.value];
     this.loadMovies(); // Load movies based on the selected suggestion
+  }
+
+  reloadPage() {
+    window.location.reload();
   }
 
   private _filter(value: string): Movie[] {
