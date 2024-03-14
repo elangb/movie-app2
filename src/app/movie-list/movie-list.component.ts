@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MovieService } from '../movie.service';
 import { Movie } from '../movie.model';
@@ -29,11 +29,11 @@ export class MovieListComponent implements OnInit {
     this.movieService.searchMovies(this.searchQuery, this.currentPage).subscribe(
       (response: any) => {
         if (response && response.Search) {
-          this.movies = this.movies.concat(response.Search);
+          this.movies = response.Search;
           this.totalResults = parseInt(response.totalResults);
-          // Update filteredMovies on loadMovies
-          this.filteredMovies = this._filter(this.searchQuery);
-          this.currentPage++;
+        } else {
+          this.movies = [];
+          this.totalResults = 0;
         }
         this.isLoading = false;
       },
@@ -44,14 +44,8 @@ export class MovieListComponent implements OnInit {
     );
   }
 
-  private _filter(value: string): Movie[] {
-    const filterValue = value.toLowerCase();
-    return this.movies.filter(movie => movie.Title.toLowerCase().includes(filterValue));
-  }
-
   searchMovies() {
     this.currentPage = 1;
-    this.movies = [];
     this.loadMovies();
   }
 
@@ -59,7 +53,17 @@ export class MovieListComponent implements OnInit {
     this.searchQuery = (event.target as HTMLInputElement).value;
     this.filteredMovies = this._filter(this.searchQuery);
   }
-  
+
+  onOptionSelected(event: any) {
+    this.searchQuery = event.option.value.Title;
+    this.filteredMovies = [event.option.value];
+    this.loadMovies(); // Load movies based on the selected suggestion
+  }
+
+  private _filter(value: string): Movie[] {
+    const filterValue = value.toLowerCase();
+    return this.movies.filter(movie => movie.Title.toLowerCase().includes(filterValue));
+  }
 
   navigateToMovieDetail(movieId: string) {
     this.router.navigate(['/movie', movieId]);
